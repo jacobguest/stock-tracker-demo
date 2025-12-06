@@ -4,5 +4,29 @@ services:
     ports:
     - "3000:3000"
     environment:
+      HOST: stock-tracker-db-instance
+      USER: postgres
+      PASSWORD: postgres
+      DATABASE: stock_tracker_db
       ALPHAVANTAGE_API_BASE_URL: https://www.alphavantage.co
       ALPHAVANTAGE_API_KEY: REAL_KEY_GOES_HERE
+    depends_on:
+      stock-tracker-db-instance:
+        condition: service_healthy
+  stock-tracker-db-instance:
+    image: postgres:18
+    ports:
+    - "5432:5432"
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stock_tracker_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d stock_tracker_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - stock-tracker-db-data:/var/lib/postgresql/postgresdata2
+volumes:
+  stock-tracker-db-data:
