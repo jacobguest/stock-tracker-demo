@@ -8,10 +8,7 @@ async function saveLatestPrice(){
 	try {
 		const res = await fetch(
 			`${API_BASE_URL}/prices/${stockSymbol}/sync/latest`,
-			{
-				method: "POST",
-				headers: { "Content-Type": "application/json" }
-			}
+			{ method: "POST" }
 		);
 		
 		if (res.status === 201)
