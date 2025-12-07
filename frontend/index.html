@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Stock Tracker Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Stock Tracker Demo</h1>
+    <button onClick="saveLatestPrice()">Save Latest Apple Stock Price</button>
+    <button onClick="viewSavedPrices()">View All Saved Apple Stock Prices</button>
+    
+    <div id="outputMessage">Click a button to load data...</div>
+
+    <table id="pricesTable">
+        <thead>
+            <tr>
+                <th>Trading Date</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Close</th>
+                <th>Volume</th>
+            </tr>
+        </thead>
+        <tbody id="pricesTableBody"></tbody>
+    </table>
+
+    <script src="env.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

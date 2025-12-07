@@ -1,4 +1,12 @@
 services:
+  stock-tracker-frontend:
+    build: ./frontend
+    ports:
+    - "80:80"
+    environment:
+      API_BASE_URL: http://localhost:3000
+    depends_on:
+      - stock-tracker-api
   stock-tracker-api:
     build: ./backend
     ports:
