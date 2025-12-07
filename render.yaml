@@ -5,6 +5,12 @@ services:
     name: stock-tracker-frontend
     plan: free
     dockerfilePath: ./Dockerfile
+    envVars:
+    - key: API_BASE_URL
+      fromService:
+        name: stock-tracker-api
+        type: web
+        envVarKey: RENDER_EXTERNAL_URL
   - type: web
     runtime: docker
     rootDir: backend
