@@ -35,6 +35,6 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - stock-tracker-db-data:/var/lib/postgresql/postgresdata2
+      - stock-tracker-db-data:/var/lib/postgresql/postgresdata
 volumes:
   stock-tracker-db-data:

@@ -1,0 +1,38 @@
+services:
+  - type: web
+    runtime: docker
+    rootDir: frontend
+    name: stock-tracker-frontend
+    plan: free
+    dockerfilePath: ./Dockerfile
+  - type: web
+    runtime: docker
+    rootDir: backend
+    name: stock-tracker-api
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ALPHAVANTAGE_API_BASE_URL
+        value: https://www.alphavantage.co
+      - key: ALPHAVANTAGE_API_KEY
+        sync: false
+      - key: HOST
+        fromDatabase:
+          name: stock-tracker-db-instance
+          property: host
+      - key: USER
+        fromDatabase:
+          name: stock-tracker-db-instance
+          property: user
+      - key: PASSWORD
+        fromDatabase:
+          name: stock-tracker-db-instance
+          property: password
+      - key: DATABASE
+        fromDatabase:
+          name: stock-tracker-db-instance
+          property: database
+databases:
+  - name: stock-tracker-db-instance
+    plan: free
+    databaseName: stock_tracker_db
