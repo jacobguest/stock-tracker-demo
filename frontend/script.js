@@ -4,8 +4,9 @@ const pricesTable = document.getElementById("pricesTable")
 const outputMessage = document.getElementById("outputMessage");
 
 async function saveLatestPrice(){
+	pricesTable.style.display = "none"
 	try {
-		const latestPrice = await fetchData(
+		const res = await fetch(
 			`${API_BASE_URL}/prices/${stockSymbol}/sync/latest`,
 			{
 				method: "POST",
@@ -13,24 +14,25 @@ async function saveLatestPrice(){
 			}
 		);
 		
-		if (latestPrice.inserted) {
-			showMessage("Saved latest price. Displaying it below...")
-		}
-		else {
-			showMessage("Latest price already saved. Displaying it below...")
-		}
-		
-		renderPricesTable([latestPrice.data])
+		if (res.status === 201)
+			showMessage(`Saved latest price for ${stockSymbol}.`)
+		else if (res.status == 200)
+			showMessage(`Latest price already saved for: ${stockSymbol}`)
+		else
+			throw new Error(`Unexpected status: ${res.status}`)
 	} 
 	catch (err) {
 		showMessage(`Error: ${err.message}`);
-		pricesTable.style.display = "none"
 	}
 };
 
 async function viewSavedPrices() {
 	try {
-		const savedPrices = await fetchData(`${API_BASE_URL}/prices/${stockSymbol}`);
+		const res = await fetch(`${API_BASE_URL}/prices/${stockSymbol}`);
+
+		if (res.status >= 400) throw new Error(`Request failed: ${res.status}`);
+
+		const savedPrices = await res.json()
 
 		if (!savedPrices.length) {
 			showMessage("No saved prices yet.");
@@ -45,12 +47,6 @@ async function viewSavedPrices() {
 		pricesTable.style.display = "none"
 	}
 };
-
-async function fetchData(url, options = {}) {
-    const res = await fetch(url, options);
-    if (res.status >= 400) throw new Error(`Request failed: ${res.status}`);
-    return res.json();
-}
 
 function renderPricesTable(prices) {
     pricesTable.tBodies[0].innerHTML = "";

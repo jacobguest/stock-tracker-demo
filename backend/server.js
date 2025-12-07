@@ -66,10 +66,9 @@ app.post("/prices/:symbol/sync/latest", async (req, res) => {
 			[symbol, tradingDate, open, high, low, close, volume]
 		);
 
-    	res.json({ 
-			inserted: dbInsertResult.rowCount === 1,
-			data: { symbol, trading_date: tradingDate, open, high, low, close, volume }
-		});
+		const statusCode = dbInsertResult.rows.length > 0 ? 201 : 200;
+
+    	res.status(statusCode).json({});
   	}
 	catch (err) {
 		console.error(err)
