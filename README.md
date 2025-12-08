@@ -1,7 +1,7 @@
 # Demo
-**Public frontend URL:** [https://stock-tracker-frontend-aagp.onrender.com/](https://stock-tracker-frontend-aagp.onrender.com/) **(Services may take some time to wake up)**
+**Public frontend URL:** [https://stock-tracker-frontend-aagp.onrender.com/](https://stock-tracker-frontend-aagp.onrender.com/) **(Services may take some time to wake up, try clicking the buttons a few times to wake the API up.)**
 
-![Demo](./demo.gif)
+![Demo](./Demo.gif)
 
 
 # Architecture 
@@ -9,6 +9,7 @@ Although I am normally more comfortable working with C#, Angular, and SQL Server
 and lighter tools better suited to the nature of the task. I chose Node.js with Express, PostgreSQL, and a plain HTML/CSS/JavaScript frontend.
 This allowed me to focus on demonstrating the core concepts involved in solving the task, without including any extra fluff that comes
 with using large frameworks. It also meant it was a great learning experience, rather than just repeating stuff I've done in the past.
+I also used containers to simplify things. It made CI/CD, local deployment and deployment on Render all a lot smoother.
 
 ## Frontend
 - Plain HTML, CSS and JavaScript
@@ -21,7 +22,7 @@ with using large frameworks. It also meant it was a great learning experience, r
 ## Backend (API)
 - Node.js + Express.js API server
 - POST /prices/:symbol/sync/latest
-    - Fetches the latest stock price from the public stock API and stores it in the database
+    - Fetches the latest stock price from the public stock API (Alpha Vantage) and stores it in the database
 - GET /prices/:symbol
     - Retrieves stored stock prices from the database
 - Database access managed through the "pg" package using connection pooling
@@ -73,19 +74,19 @@ with using large frameworks. It also meant it was a great learning experience, r
 - On render the containers are not running on the same host, meaning they communicate using the external URLs of each service
 
 # What Works
+- CI/CD: Github workflows are used to spin up a test environment, run an E2E test and some API unit tests, only allowing code to be merged with main (through a PR) if the tests all pass
+- Once code is merged with main, deployment automatically occurs on Render and is accessible from a public URL
 - A simple data schema that effectively balances simple requirements with the ability to extend in the future
 - Apple stock data is fetched and stored through this pipeline:
 Frontend requests -> Backend API fetches from public stock API -> Backend API stores in database
 - Minimal frontend displays stored Apple stock prices through this pipeline:
 Frontend requests -> Backend API queries database -> Backend API returns data -> Frontend displays data
 - Containerised services run locally with minimal setup, including frontend, backend API, and database
-- Project is deployed on Render and accessible from a public URL
-- Partial CI/CD: Automated builds and deployments on Render occur when commits are made to the main branch.
 
 # What Doesn't Work / Improvements
 - All of the main tasks have been addressed, but there are improvements that could be made which I will go into now
-- Full CI/CD - Although there are automated builds and deployments with Render, improvements could include:
-    - Automated testing (Unit tests, Integration tests, Basic UI rendering tests)
+- Improved CI/CD
+    - The current tests are ran as part of a "pre-merge with main" check, meaning even if they pass, there's a chance the deployment could fail on Render as the environments may potentially differ
     - Linting
     - Automatic rollbacks on deployment fail
 - Authentication / API rate limiting
@@ -97,7 +98,7 @@ Frontend requests -> Backend API queries database -> Backend API returns data ->
     - Some kind of initialisation script or migrations framework may be better
 - Deployment Improvements
     - Deployment may currently be overengineered
-    - Multiple containers running for a simple ingest/store/display pipeline is quite overkill
+    - Multiple containers running for a simple ingest/store/display pipeline could be considered quite a lot
 - Functionality improvements
     - Currently provides limited functionality, only getting the latest Apple stock price
     - Could provide more options e.g. Apple stock on a user-specified date
@@ -118,7 +119,7 @@ Make sure you have the following installed on your machine:
     ```
 3. Open the cloned project folder in a text editor of your choice
 4. Sign up for a free stocks API key from Alpha Vantage at [https://www.alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key)
-5. Replace the placeholder "REAL_KEY_GOES_HERE" in the docker-compose.yml file with your API key and save the file
+5. Replace the placeholder "${ALPHAVANTAGE_API_KEY}" in the docker-compose.yml file with your API key and save the file
 6. Open a terminal, navigate to the root of the project and run:
     ```sh
     docker compose up --build -d
@@ -140,16 +141,27 @@ docker compose down
 - If you don't want them, you can comment out the volumes related code in the docker-compose
 - If you want to delete a volume for a fresh run (It will be recreated on rebuild) you can do this:
     ```sh
-    docker compose down 
-    docker volume ls
-    docker rm volume_name
+    docker compose down -v
     ```
+## Running tests locally
+- Although the tests run when you make a PR to main from a feature branch, you can also run them locally. This will require **Node 20** installed on your machine
+1. Open a terminal in the root directory of the project
+3. docker compose down -v
+4. docker compose up --build -d
+5. cd backend
+6. npm install
+7. cd ../tests
+8. npm install
+9. npx playwright install --with-deps
+10. npm run test:app
+11. npm run test:e2e
+
 
 # Deploying the project on Render
 ## Steps
 1. [Sign up for a Render account](https://dashboard.render.com/register)
 2. [Navigate to the Blueprints section](https://dashboard.render.com/blueprints) and create a new blueprint instance
-3. Use the public URL of this repository: https://github.com/jacobguest/stock-tracker-demo.git and give your blueprint a name like stock-tracker-demo
+3. Use the public URL of this repository: https://github.com/jacobguest/stock-tracker-demo.git and give your blueprint a name like stock-tracker-demo. You may need to use your git credentials to connect.
 4. You will be prompted to provide an ALPHAVANTAGE_API_KEY environment variable. See below
 4. Sign up for a free stocks API key from Alpha Vantage at [https://www.alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key)
 6. After hitting deploy, the project should be deployed on Render within a few minutes
