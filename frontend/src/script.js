@@ -13,7 +13,7 @@ async function saveLatestPrice(){
 		
 		if (res.status === 201)
 			showMessage(`Saved latest price for ${stockSymbol}.`)
-		else if (res.status == 200)
+		else if (res.status === 200)
 			showMessage(`Latest price already saved for: ${stockSymbol}`)
 		else
 			throw new Error(`Unexpected status: ${res.status}`)
