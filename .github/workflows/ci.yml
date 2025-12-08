@@ -1,0 +1,50 @@
+name: Stock Tracker CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install test dependencies
+        working-directory: ./tests
+        run: npm install
+
+      - name: Install Playwright browsers
+        working-directory: ./tests
+        run: npx playwright install --with-deps
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Run backend API unit tests
+        working-directory: ./tests
+        run: npm run test:app
+
+      - name: Build and start application
+        run: docker compose up -d --build
+        env:
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+      
+      - name: Wait for services to be ready
+        run: sleep 15
+
+      - name: Run E2E tests
+        working-directory: ./tests
+        run: npm run test:e2e
+
+      - name: Shut down containers
+        if: always()
+        run: docker compose down -v

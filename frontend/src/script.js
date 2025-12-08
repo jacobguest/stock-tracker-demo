@@ -19,7 +19,7 @@ async function saveLatestPrice(){
 			throw new Error(`Unexpected status: ${res.status}`)
 	} 
 	catch (err) {
-		showMessage(`Error: ${err.message}`);
+		showMessage(`Error: ${err.message} - API may still be waking up.`);
 	}
 };
 
@@ -27,7 +27,7 @@ async function viewSavedPrices() {
 	try {
 		const res = await fetch(`${API_BASE_URL}/prices/${stockSymbol}`);
 
-		if (res.status >= 400) throw new Error(`Request failed: ${res.status}`);
+		if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
 		const savedPrices = await res.json()
 
@@ -40,7 +40,7 @@ async function viewSavedPrices() {
 		renderPricesTable(savedPrices)
 	} 
 	catch (err) {
-		showMessage(`Error: ${err.message}`);
+		showMessage(`Error: ${err.message} - API may still be waking up.`);
 		pricesTable.style.display = "none"
 	}
 };
