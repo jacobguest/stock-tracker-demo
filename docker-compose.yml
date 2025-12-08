@@ -17,7 +17,7 @@ services:
       PASSWORD: postgres
       DATABASE: stock_tracker_db
       ALPHAVANTAGE_API_BASE_URL: https://www.alphavantage.co
-      ALPHAVANTAGE_API_KEY: REAL_KEY_GOES_HERE
+      ALPHAVANTAGE_API_KEY: ${ALPHAVANTAGE_API_KEY}
     depends_on:
       stock-tracker-db-instance:
         condition: service_healthy
